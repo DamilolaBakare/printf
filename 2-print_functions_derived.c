@@ -1,92 +1,100 @@
 #include "main.h"
-#include <stdarg.h>
-#include <stdlib.h>
+
+unsigned int convert_c(va_list args, buffer_t *output,
+		unsigned char flags, int wid, int prec, unsigned char len);
+unsigned int convert_percent(va_list args, buffer_t *output,
+		unsigned char flags, int wid, int prec, unsigned char len);
+unsigned int convert_p(va_list args, buffer_t *output,
+		unsigned char flags, int wid, int prec, unsigned char len);
 
 /**
- * print_unsignedToBinary - prints an integer.
- * @arg: argument
- * Return: 0
+ * convert_c - Converts an argument to an unsigned char and
+ *             stores it to a buffer contained in a struct.
+ * @args: A va_list pointing to the argument to be converted.
+ * @flags: Flag modifiers.
+ * @wid: A width modifier.
+ * @prec: A precision modifier.
+ * @len: A length modifier.
+ * @output: A buffer_t struct containing a character array.
+ *
+ * Return: The number of bytes stored to the buffer.
  */
-int print_unsignedToBinary(va_list arg)
+unsigned int convert_c(va_list args, buffer_t *output,
+		unsigned char flags, int wid, int prec, unsigned char len)
 {
+	char c;
+	unsigned int ret = 0;
 
-unsigned int n = va_arg(arg, unsigned int);
-unsigned int printed;
+	(void)prec;
+	(void)len;
 
-print_binary(n, &printed);
-print_binary(n, &printed);
+	c = va_arg(args, int);
 
-return (printed);
-}
+	ret += print_width(output, ret, flags, wid);
+	ret += _memcpy(output, &c, 1);
+	ret += print_neg_width(output, ret, flags, wid);
 
-
-/**
- * print_oct - prints number in octal base.
- * @arg: list containing octal number to be printed
- * Return: number of octals printed
- */
-
-int print_oct(va_list arg)
-{
-	unsigned int num = va_arg(arg, unsigned int);
-	unsigned int copy;
-	char *octa;
-	int i, j, charPrinted = 0;
-
-	if (num == 0)
-		return (_putchar('0'));
-	for (copy = num; copy != 0; j++)
-	{
-		copy = copy / 8;
-	}
-	octa = malloc(j);
-	if (!octa)
-		return (-1);
-
-	for (i = j - 1; i >= 0; i--)
-	{
-		octa[i] = num % 8 + '0';
-		num = num / 8;
-	}
-
-	for (i = 0; i < j && octa[i] == '0'; i++)
-		;
-	for (; i < j; i++)
-	{
-		_putchar(octa[i]);
-		charPrinted++;
-	}
-	free(octa);
-	return (charPrinted);
+	return (ret);
 }
 
 /**
- * print_unsignedIntToHex - prints unsigned int to hexadecimal.
- * @num: number to print
- * @_case: letter `a` on the case to print it (upper or lower)
- * Return: number or char printed
+ * convert_percent - Stores a percent sign to a
+ *                   buffer contained in a struct.
+ * @args: A va_list pointing to the argument to be converted.
+ * @flags: Flag modifiers.
+ * @wid: A width modifier.
+ * @prec: A precision modifier.
+ * @len: A length modifier.
+ * @output: A buffer_t struct containing a character array.
+ *
+ * Return: The number of bytes stored to the buffer (always 1).
  */
-int print_unsignedIntToHex(unsigned int num, char _case)
+unsigned int convert_percent(va_list args, buffer_t *output,
+		unsigned char flags, int wid, int prec, unsigned char len)
 {
-	unsigned int num2;
-	int i, j, remainder, nbrCharacters = 0;
-	char *numhex;
+	char percent = '%';
+	unsigned int ret = 0;
 
-	for (num2 = num; num2 != 0; nbrCharacters++, num2 /= 16)
-	;
+	(void)args;
+	(void)prec;
+	(void)len;
 
-	numhex = malloc(nbrCharacters);
-	for (i = 0; num != 0; i++)
-	{
-		remainder = num % 16;
-		if (remainder < 10)
-			numhex[i] = remainder + '0';
-		else
-			numhex[i] = remainder - 10 + _case;
-		num = num / 16;
-	}
-	for (j = i - 1; j >= 0; j--)
-		_putchar(numhex[j]);
-	free(numhex);
-	return (nbrCharacters);
+	ret += print_width(output, ret, flags, wid);
+	ret += _memcpy(output, &percent, 1);
+	ret += print_neg_width(output, ret, flags, wid);
+
+	return (ret);
+}
+
+/**
+ * convert_p - Converts the address of an argument to hex and
+ *             stores it to a buffer contained in a struct.
+ * @args: A va_list pointing to the argument to be converted.
+ * @flags: Flag modifiers.
+ * @wid: A width modifier.
+ * @prec: A precision modifier.
+ * @len: A length modifier.
+ * @output: A buffer_t struct containing a character array.
+ *
+ * Return: The number of bytes stored to the buffer.
+ */
+unsigned int convert_p(va_list args, buffer_t *output,
+		unsigned char flags, int wid, int prec, unsigned char len)
+{
+	char *null = "(nil)";
+	unsigned long int address;
+	unsigned int ret = 0;
+
+	(void)len;
+
+	address = va_arg(args, unsigned long int);
+	if (address == '\0')
+		return (_memcpy(output, null, 5));
+
+	flags |= 32;
+	ret += convert_ubase(output, address, "0123456789abcdef",
+			flags, wid, prec);
+	ret += print_neg_width(output, ret, flags, wid);
+
+	return (ret);
 }

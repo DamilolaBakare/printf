@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-
 /**
  * _putchar - writes the character c to stdout
  * @c: The character to print
@@ -51,7 +50,7 @@ void _puts(char *str)
  *@representation: char representation[] = "0123456789ABCDEF";
  *@num: num to tranasform
  *@base: base to transform num
- *Return: number into char pointer
+ *Return: num into char pointer
  */
 char *convert_to(char representation[], unsigned int num, int base)
 {

@@ -1,124 +1,100 @@
 #include "main.h"
-#include <unistd.h>
-#include <stdio.h>
+
+unsigned int convert_c(va_list args, buffer_t *output,
+		unsigned char flags, int wid, int prec, unsigned char len);
+unsigned int convert_percent(va_list args, buffer_t *output,
+		unsigned char flags, int wid, int prec, unsigned char len);
+unsigned int convert_p(va_list args, buffer_t *output,
+		unsigned char flags, int wid, int prec, unsigned char len);
+
 /**
- * print_char - writes the character c to stdout
- * @arg: argument
+ * convert_c - Converts an argument to an unsigned char and
+ *             stores it to a buffer contained in a struct.
+ * @args: A va_list pointing to the argument to be converted.
+ * @flags: Flag modifiers.
+ * @wid: A width modifier.
+ * @prec: A precision modifier.
+ * @len: A length modifier.
+ * @output: A buffer_t struct containing a character array.
  *
- * Return: On success 1.
- * On error, -1 is returned, and errno is set appropriately.
+ * Return: The number of bytes stored to the buffer.
  */
-int print_char(va_list arg)
+unsigned int convert_c(va_list args, buffer_t *output,
+		unsigned char flags, int wid, int prec, unsigned char len)
 {
-	return (_putchar(va_arg(arg, int)));
+	char c;
+	unsigned int ret = 0;
+
+	(void)prec;
+	(void)len;
+
+	c = va_arg(args, int);
+
+	ret += print_width(output, ret, flags, wid);
+	ret += _memcpy(output, &c, 1);
+	ret += print_neg_width(output, ret, flags, wid);
+
+	return (ret);
 }
 
 /**
- * print_int - prints an integer.
- * @arg: argument
- * Return: 0
+ * convert_percent - Stores a percent sign to a
+ *                   buffer contained in a struct.
+ * @args: A va_list pointing to the argument to be converted.
+ * @flags: Flag modifiers.
+ * @wid: A width modifier.
+ * @prec: A precision modifier.
+ * @len: A length modifier.
+ * @output: A buffer_t struct containing a character array.
+ *
+ * Return: The number of bytes stored to the buffer (always 1).
  */
-
-int print_int(va_list arg)
+unsigned int convert_percent(va_list args, buffer_t *output,
+		unsigned char flags, int wid, int prec, unsigned char len)
 {
+	char percent = '%';
+	unsigned int ret = 0;
 
-unsigned int divisor = 1, i, resp, charPrinted = 0;
-int n = va_arg(arg, int);
+	(void)args;
+	(void)prec;
+	(void)len;
 
-if (n < 0)
-{
-	_putchar('-');
-	charPrinted++;
-	n *= -1;
-}
+	ret += print_width(output, ret, flags, wid);
+	ret += _memcpy(output, &percent, 1);
+	ret += print_neg_width(output, ret, flags, wid);
 
-for (i = 0; n / divisor > 9; i++, divisor *= 10)
-;
-
-for (; divisor >= 1; n %= divisor, divisor /= 10, charPrinted++)
-{
-	resp = n / divisor;
-	_putchar('0' + resp);
-}
-return (charPrinted);
-}
-
-
-
-/**
- * print_STR - prints a string with a `S` (upper case) specificer
- * @arg: argument
- * Return: number of character printed
- */
-
-int print_STR(va_list arg)
-{
-int i;
-char *str = va_arg(arg, char*);
-
-if (str == NULL)
-	str = "(null)";
-else if (*str == '\0')
-	return (-1);
-
-for (i = 0; str[i]; i++)
-{
-	if ((str[i] < 32 && str[i] > 0) || str[i] >= 127)
-	{
-		_putchar('\\');
-		_putchar('x');
-		if (i < 16)
-			_putchar('0');
-
-		print_unsignedIntToHex(str[i], 'A');
-	}
-	else
-		_putchar(str[i]);
-}
-
-return (i);
+	return (ret);
 }
 
 /**
- * print_str - prints a string with a `s` (lower case) specifier
- * @arg: argument
- * Return: number of character printed
+ * convert_p - Converts the address of an argument to hex and
+ *             stores it to a buffer contained in a struct.
+ * @args: A va_list pointing to the argument to be converted.
+ * @flags: Flag modifiers.
+ * @wid: A width modifier.
+ * @prec: A precision modifier.
+ * @len: A length modifier.
+ * @output: A buffer_t struct containing a character array.
+ *
+ * Return: The number of bytes stored to the buffer.
  */
-
-int print_str(va_list arg)
+unsigned int convert_p(va_list args, buffer_t *output,
+		unsigned char flags, int wid, int prec, unsigned char len)
 {
-int i;
-char *str = va_arg(arg, char*);
+	char *null = "(nil)";
+	unsigned long int address;
+	unsigned int ret = 0;
 
-if (str == NULL)
-	str = "(null)";
-else if (*str == '\0')
-	return (-1);
+	(void)len;
 
-for (i = 0; str[i]; i++)
-	_putchar(str[i]);
+	address = va_arg(args, unsigned long int);
+	if (address == '\0')
+		return (_memcpy(output, null, 5));
 
-return (i);
-}
+	flags |= 32;
+	ret += convert_ubase(output, address, "0123456789abcdef",
+			flags, wid, prec);
+	ret += print_neg_width(output, ret, flags, wid);
 
-/**
- * print_unsigned - prints an unsigned int.
- * @arg: argument
- * Return: 0
- */
-
-int print_unsigned(va_list arg)
-{
-int divisor = 1, i, resp;
-unsigned int n = va_arg(arg, unsigned int);
-
-for (i = 0; n / divisor > 9; i++, divisor *= 10)
-;
-
-for (; divisor >= 1; n %= divisor, divisor /= 10)
-{
-	resp = n / divisor;
-	_putchar('0' + resp);
-}
-return (i + 1);
+	return (ret);
 }

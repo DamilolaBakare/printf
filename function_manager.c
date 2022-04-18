@@ -17,6 +17,7 @@ int function_manager(char c, va_list arg)
 		cont = print_ptr(arg);
 	return (cont);
 }
+
 /**
  *_switch - switch
  *@c: character to find

@@ -3,7 +3,7 @@
  *_printf - printf
  *@format: const char pointer
  *Description: this functions implement some functions of printf
- *Return: num of characteres printed
+ *Return: number of characteres printed
  */
 int _printf(const char *format, ...)
 {
@@ -93,7 +93,6 @@ int check_percent(int *flag, char aux)
 	}
 	return (cont);
 }
-
 /**
  * call_function_manager - call function manager
  *@aux: character parameter

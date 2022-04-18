@@ -1,100 +1,84 @@
 #include "main.h"
 
-unsigned int convert_c(va_list args, buffer_t *output,
-		unsigned char flags, int wid, int prec, unsigned char len);
-unsigned int convert_percent(va_list args, buffer_t *output,
-		unsigned char flags, int wid, int prec, unsigned char len);
-unsigned int convert_p(va_list args, buffer_t *output,
-		unsigned char flags, int wid, int prec, unsigned char len);
-
 /**
- * convert_c - Converts an argument to an unsigned char and
- *             stores it to a buffer contained in a struct.
- * @args: A va_list pointing to the argument to be converted.
- * @flags: Flag modifiers.
- * @wid: A width modifier.
- * @prec: A precision modifier.
- * @len: A length modifier.
- * @output: A buffer_t struct containing a character array.
- *
- * Return: The number of bytes stored to the buffer.
+ * print_int - prints an integer
+ * @l: va_list of arguments from _printf
+ * @f: pointer to the struct flags determining
+ * if a flag is passed to _printf
+ * Return: number of char printed
  */
-unsigned int convert_c(va_list args, buffer_t *output,
-		unsigned char flags, int wid, int prec, unsigned char len)
+int print_int(va_list l, flags_t *f)
 {
-	char c;
-	unsigned int ret = 0;
+	int n = va_arg(l, int);
+	int res = count_digit(n);
 
-	(void)prec;
-	(void)len;
-
-	c = va_arg(args, int);
-
-	ret += print_width(output, ret, flags, wid);
-	ret += _memcpy(output, &c, 1);
-	ret += print_neg_width(output, ret, flags, wid);
-
-	return (ret);
+	if (f->space == 1 && f->plus == 0 && n >= 0)
+		res += _putchar(' ');
+	if (f->plus == 1 && n >= 0)
+		res += _putchar('+');
+	if (n <= 0)
+		res++;
+	print_number(n);
+	return (res);
 }
 
 /**
- * convert_percent - Stores a percent sign to a
- *                   buffer contained in a struct.
- * @args: A va_list pointing to the argument to be converted.
- * @flags: Flag modifiers.
- * @wid: A width modifier.
- * @prec: A precision modifier.
- * @len: A length modifier.
- * @output: A buffer_t struct containing a character array.
- *
- * Return: The number of bytes stored to the buffer (always 1).
+ * print_unsigned - prints an unsigned integer
+ * @l: va_list of arguments from _printf
+ * @f: pointer to the struct flags determining
+ * if a flag is passed to _printf
+ * Return: number of char printed
  */
-unsigned int convert_percent(va_list args, buffer_t *output,
-		unsigned char flags, int wid, int prec, unsigned char len)
+int print_unsigned(va_list l, flags_t *f)
 {
-	char percent = '%';
-	unsigned int ret = 0;
+	unsigned int u = va_arg(l, unsigned int);
+	char *str = convert(u, 10, 0);
 
-	(void)args;
-	(void)prec;
-	(void)len;
-
-	ret += print_width(output, ret, flags, wid);
-	ret += _memcpy(output, &percent, 1);
-	ret += print_neg_width(output, ret, flags, wid);
-
-	return (ret);
+	(void)f;
+	return (_puts(str));
 }
 
 /**
- * convert_p - Converts the address of an argument to hex and
- *             stores it to a buffer contained in a struct.
- * @args: A va_list pointing to the argument to be converted.
- * @flags: Flag modifiers.
- * @wid: A width modifier.
- * @prec: A precision modifier.
- * @len: A length modifier.
- * @output: A buffer_t struct containing a character array.
- *
- * Return: The number of bytes stored to the buffer.
+ * print_number - helper function that loops through
+ * an integer and prints all its digits
+ * @n: integer to be printed
  */
-unsigned int convert_p(va_list args, buffer_t *output,
-		unsigned char flags, int wid, int prec, unsigned char len)
+void print_number(int n)
 {
-	char *null = "(nil)";
-	unsigned long int address;
-	unsigned int ret = 0;
+	unsigned int n1;
 
-	(void)len;
+	if (n < 0)
+	{
+		_putchar('-');
+		n1 = -n;
+	}
+	else
+		n1 = n;
 
-	address = va_arg(args, unsigned long int);
-	if (address == '\0')
-		return (_memcpy(output, null, 5));
+	if (n1 / 10)
+		print_number(n1 / 10);
+	_putchar((n1 % 10) + '0');
+}
 
-	flags |= 32;
-	ret += convert_ubase(output, address, "0123456789abcdef",
-			flags, wid, prec);
-	ret += print_neg_width(output, ret, flags, wid);
+/**
+ * count_digit - returns the number of digits in an integer
+ * for _printf
+ * @i: integer to evaluate
+ * Return: number of digits
+ */
+int count_digit(int i)
+{
+	unsigned int d = 0;
+	unsigned int u;
 
-	return (ret);
+	if (i < 0)
+		u = i * -1;
+	else
+		u = i;
+	while (u != 0)
+	{
+		u /= 10;
+		d++;
+	}
+	return (d);
 }

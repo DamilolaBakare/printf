@@ -71,20 +71,34 @@ _printf("Unknown:[%r]\n");
 Files contained in this repository
 Name	Information	Relevant Files
 man_3_printf	Man page of the _printf() function.	None
-holberton.h	Header file with the data type struct, standard libraries and custom prototypes.	*.c compilation
+main.h	Header file with the data type struct, standard libraries and custom prototypes.	*.c compilation
+
 _printf.c	Main printf function file. Calls other functions.	printf_(name of var).c file
+
 print_numbers.c	Contains decimal and integer functions.	None
+
 print_chars.c	Custom function for char data type.	None
+
 printf_sting.c	Function that calls string type variable.	None
+
 printf_oct.c	Functions that returns octal number.	None
+
 printf_hex.c	Calls hexadecimal numbers (lowercase).	None
+
 printf_HEX.c	Calls hexadecimal numbers (Uppercase).	None
+
 printf_unsigned.c	Returns an unisgined data type.	None
+
 print_unsigned_int.c	contains the functions print_u, print_o, and print_b, which handle the conversion specifiers u, o, and b, respectively,	None
+
 printf_srev.c	Returns a string in reverse.	None
+
 print_rot13.c	Returns a string in Rot13.	None
+
 printf_str.c	Auxiliar functions such as strlen and strcpy.	None
+
 _putchar.c	Custom putchar function.	None
+
 Tasks required for this project
 I am not going anywhere. You can print that wherever you want to. I'm here and I am a Spur for life1. I am not going anywhere. You can print that wherever you want to. I'm here and I am a Spur for life.
 Write a function that produces output according to a format. Handle the following conversion specifiers:
